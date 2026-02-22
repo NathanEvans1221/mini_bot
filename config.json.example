@@ -1,15 +1,4 @@
 {
-  "providers": {
-    "minimax": {
-      "apiKey": "your-minimax-api-key-here",
-      "apiBase": "https://api.minimax.io/v1"
-    }
-  },
-  "channels": {
-    "telegram": {
-      "botToken": "your-telegram-bot-token-here"
-    }
-  },
   "agents": {
     "defaults": {
       "model": "minimax/MiniMax-M2.5",
@@ -18,6 +7,21 @@
       "maxToolIterations": 20,
       "memoryWindow": 50,
       "workspace": "~/.minibot/workspace"
+    }
+  },
+  "providers": {
+    "minimax": {
+      "apiKey": "your-minimax-api-key-here",
+      "apiBase": "https://api.minimax.io/v1"
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "your-telegram-bot-token-here",
+      "allow_from": [
+        "your-telegram-user-id-here"
+      ]
     }
   }
 }

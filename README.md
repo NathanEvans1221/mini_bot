@@ -25,6 +25,42 @@ pyenv local 3.11.9
 python3 --version
 ```
 
+### 1.1 WSL 環境準備（Ubuntu/Debian）
+
+```bash
+# 安裝 zsh（推薦）與必備工具
+sudo apt update && sudo apt install -y zsh curl wget git python3 python3-pip python3-venv
+
+# 設定 Python 3.11
+sudo apt install -y python3.11 python3.11-venv python3.11-dev
+pyenv install 3.11.9
+pyenv local 3.11.9
+
+# 確認版本
+python3 --version
+
+# 安裝 Oh My Zsh（可選 but 推薦）
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# 推薦外掛：歷史搜尋 + 自動補全
+# 在 ~/.zshrc 中添加以下內容（需在 source $ZSH/oh-my-zsh.sh 之前）：
+plugins=(git z sudo history-substring-search)
+
+# 歷史記錄與自動補全配置（添加在 source $ZSH/oh-my-zsh.sh 之前）
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+autoload -Uz compinit
+compinit
+```
+
+> **WSL 注意事項**：
+> - 執行 Windows 原生程式（如 `code`, `explorer`）需使用 `/mnt/c/...` 路徑
+> - 若要呼叫 Windows 執行檔，可將 PATH 加入 `.zshrc`
+> - Telegram Bot 在 WSL 環境執行方式與 Linux 相同
+
 ### 2. 安裝與設定
 
 ```bash
@@ -40,8 +76,10 @@ cp config.example.json ~/.minibot/config.json
 minibot onboard
 
 # 編輯 API Key (支援開源模型或各大 Provider)
-# macOS 使用 open -e, Windows 使用 notepad
-open -e ~/.minibot/config.json
+# macOS 使用 open -e, Linux/WSS 使用 nano/vim/code
+code ~/.minibot/config.json
+# 或
+nano ~/.minibot/config.json
 
 # 初始化 Workspace 範本
 cp workspace/AGENTS.md.example workspace/AGENTS.md
@@ -95,7 +133,8 @@ minibot status
 
 設定好 `botToken` 後，執行：
 
-```powershell
+```bash
+# Linux/macOS/WSL
 minibot telegram
 ```
 
@@ -143,10 +182,18 @@ minibot telegram
 
 ## 程式碼量統計 (極簡約定)
 
-本專案旨在維持極簡的 Agent 核心框架。你隨時可以用以下 PowerShell 指令追蹤目前的 `minibot` 套件 `.py` 檔案總行數：
+本專案旨在維持極簡的 Agent 核心框架。你隨時可以用以下指令追蹤目前的 `minibot` 套件 `.py` 檔案總行數：
+
+```bash
+# 統計總行數 (Linux/macOS)
+find minibot -name "*.py" -type f | xargs wc -l | tail -1
+
+# 列出各檔案行數排行榜
+find minibot -name "*.py" -type f -exec wc -l {} + | sort -rn | head -20
+```
 
 ```powershell
-# 統計總行數
+# 統計總行數 (PowerShell/Windows)
 (Get-ChildItem -Recurse -File -Filter *.py minibot | Get-Content | Measure-Object -Line).Lines
 
 # 列出各檔案行數排行榜

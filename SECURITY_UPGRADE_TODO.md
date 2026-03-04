@@ -27,10 +27,10 @@
 **位置**：`minibot/agent/tools/filesystem.py:21-47`
 
 **修復方向**：
-- [ ] 實作允許列表 (whitelist) 机制，只允許執行預定義的安全命令
-- [ ] 移除 `shell=True` 参数，改用命令列表
-- [ ] 添加執行逾時和資源限制
-- [ ] 考慮完全移除 ShellTool 或設為可選功能
+- [x] 實作允許列表 (whitelist) 机制，只允許執行預定義的安全命令
+- [x] 移除 `shell=True` 参数，改用命令列表
+- [x] 添加執行逾時和資源限制
+- [x] 考慮完全移除 ShellTool 或設為可選功能
 
 **驗證方法**：
 ```python
@@ -49,10 +49,10 @@ result = await tool.execute("cat /etc/passwd")  # 應回傳錯誤
 **位置**：`minibot/agent/tools/filesystem.py:61-108`
 
 **修復方向**：
-- [ ] 實作 workspace 目錄限制，所有檔案操作必須在 workspace 內
-- [ ] 添加路徑驗證，阻止 `../` 路徑穿越
-- [ ] 實作黑名單機制，阻止存取系統敏感檔案（如 `/etc/passwd`, `~/.ssh/` 等）
-- [ ] 限制檔案大小，防止記憶體耗盡
+- [x] 實作 workspace 目錄限制，所有檔案操作必須在 workspace 內
+- [x] 添加路徑驗證，阻止 `../` 路徑穿越
+- [x] 實作黑名單機制，阻止存取系統敏感檔案（如 `/etc/passwd`, `~/.ssh/` 等）
+- [x] 限制檔案大小，防止記憶體耗盡
 
 **驗證方法**：
 ```python
@@ -75,10 +75,10 @@ result = await tool.execute("~/.ssh/id_rsa")  # 應回傳錯誤
 - `config.example.json`
 
 **修復方向**：
-- [ ] 使用環境變數作為主要 API Key 來源（優先於 config）
-- [ ] 實作 config 加密機制（如使用 `cryptography` 庫）
-- [ ] 在 config 加載時使用 pydantic validator 驗證
-- [ ] 從環境變數讀取敏感資訊時提供提示
+- [x] 使用環境變數作為主要 API Key 來源（優先於 config）
+- [x] 實作 config 加密機制（如使用 `cryptography` 庫）
+- [x] 在 config 加載時使用 pydantic validator 驗證
+- [x] 從環境變數讀取敏感資訊時提供提示
 
 **驗證方法**：
 ```bash
@@ -97,10 +97,15 @@ minibot agent
 **位置**：`pyproject.toml`
 
 **修復方向**：
-- [ ] 執行 `pip-audit` 或 `safety` 檢查已知漏洞
-- [ ] 更新有漏洞的依賴庫版本
-- [ ] 記錄依賴庫安全審查結果
-- [ ] 設定依賴庫版本上限 (>=x.y.z, <最新穩定版)
+- [x] 執行 `pip-audit` 或 `safety` 檢查已知漏洞
+- [x] 更新有漏洞的依賴庫版本
+- [x] 記錄依賴庫安全審查結果
+- [x] 設定依賴庫版本上限 (>=x.y.z, <最新穩定版)
+
+**審查結果**：
+- 專案依賴庫（litellm, pydantic, python-telegram-bot 等）無已知漏洞
+- 已升級 setuptools 至安全版本（78.1.1）
+- 已在 pyproject.toml 添加 pip-audit 配置要求
 
 **驗證命令**：
 ```bash
@@ -120,9 +125,9 @@ safety check
 **位置**：`minibot/agent/loop.py:104-122`
 
 **修復方向**：
-- [ ] 實作輸入過濾，移除或轉義特殊字符
-- [ ] 考慮使用分隔符隔離用戶輸入
-- [ ] 記錄並監控異常注入模式
+- [x] 實作輸入過濾，移除或轉義特殊字符
+- [x] 考慮使用分隔符隔離用戶輸入
+- [x] 記錄並監控異常注入模式
 
 ---
 
@@ -133,9 +138,9 @@ safety check
 **位置**：`minibot/session/manager.py`
 
 **修復方向**：
-- [ ] 實作用戶 ID 驗證
-- [ ] 實作會話存取權限控制
-- [ ] 添加會話逾時機制
+- [x] 實作用戶 ID 驗證
+- [x] 實作會話存取權限控制
+- [x] 添加會話逾時機制
 
 ---
 
@@ -146,8 +151,8 @@ safety check
 **問題**：錯誤訊息可能洩露內部資訊
 
 **修復方向**：
-- [ ] 檢視所有錯誤訊息，確保不洩露敏感資訊
-- [ ] 實作統一的錯誤處理機制
+- [x] 檢視所有錯誤訊息，確保不洩露敏感資訊
+- [x] 實作統一的錯誤處理機制
 
 ---
 
@@ -164,13 +169,13 @@ safety check
 
 完成每個任務後，請勾選：
 
-- [ ] T1: Shell Tool 安全性修復
-- [ ] T2: 路徑遍歷漏洞修復
-- [ ] T3: API Key 安全存儲
-- [ ] T4: 依賴庫安全性審查
-- [ ] T5: 對話注入防護
-- [ ] T6: 會話隔離與存取控制
-- [ ] T7: 錯誤訊息脫敏
+- [x] T1: Shell Tool 安全性修復
+- [x] T2: 路徑遍歷漏洞修復
+- [x] T3: API Key 安全存儲
+- [x] T4: 依賴庫安全性審查
+- [x] T5: 對話注入防護
+- [x] T6: 會話隔離與存取控制
+- [x] T7: 錯誤訊息脫敏
 
 ---
 

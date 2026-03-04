@@ -10,7 +10,7 @@ from loguru import logger
 
 from minibot.agent.context import ContextBuilder
 from minibot.agent.tools.registry import ToolRegistry
-from minibot.agent.tools.filesystem import ReadFileTool, WriteFileTool, ListDirTool, ShellTool
+from minibot.agent.tools.filesystem import ReadFileTool, WriteFileTool, ListDirTool, ShellTool, set_workspace
 from minibot.bus.events import InboundMessage, OutboundMessage
 from minibot.bus.queue import MessageBus
 from minibot.providers.base import LLMProvider
@@ -35,6 +35,7 @@ class AgentLoop:
         self.bus = bus
         self.provider = provider
         self.workspace = workspace
+        set_workspace(workspace)
         self.model = model or provider.get_default_model()
         self.max_iterations = max_iterations
         self.temperature = temperature

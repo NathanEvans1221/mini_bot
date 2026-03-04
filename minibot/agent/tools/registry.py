@@ -1,6 +1,8 @@
 """Tool registry."""
 
 from typing import Any
+from loguru import logger
+
 from minibot.agent.tools.base import Tool
 
 
@@ -30,4 +32,5 @@ class ToolRegistry:
         try:
             return await tool.execute(**params)
         except Exception as e:
-            return f"Error executing {name}: {e}"
+            logger.error("Tool execution error: {}", e)
+            return "抱歉，執行工具時發生錯誤，請稍後再試。"

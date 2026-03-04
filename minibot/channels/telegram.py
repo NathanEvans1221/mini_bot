@@ -77,7 +77,7 @@ class TelegramChannel:
 
         except Exception as e:
             logger.error("Telegram handler error: {}", e)
-            await update.message.reply_text(f"❌ Error: {e}")
+            await update.message.reply_text("抱歉，處理您的請求時發生錯誤，請稍後再試。")
 
     def run(self) -> None:
         """啟動 Telegram Bot（Polling 模式）。"""

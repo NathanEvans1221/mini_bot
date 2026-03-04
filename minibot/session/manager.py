@@ -3,12 +3,14 @@
 import json
 from pathlib import Path
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from loguru import logger
 
 from minibot.utils.helpers import ensure_dir, safe_filename
+
+SESSION_TIMEOUT = timedelta(hours=24)
 
 
 @dataclass
@@ -24,11 +26,16 @@ class Session:
     """
 
     key: str  # channel:chat_id
+    owner_id: str = ""  # User ID for session isolation
     messages: list[dict[str, Any]] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     metadata: dict[str, Any] = field(default_factory=dict)
     last_consolidated: int = 0  # 已整合至檔案的訊息數
+
+    def is_expired(self) -> bool:
+        """檢查 session 是否過期。"""
+        return datetime.now() - self.updated_at > SESSION_TIMEOUT
 
     def add_message(self, role: str, content: str, **kwargs: Any) -> None:
         """新增訊息至 session。"""
@@ -82,27 +89,34 @@ class SessionManager:
         safe_key = safe_filename(key.replace(":", "_"))
         return self.legacy_sessions_dir / f"{safe_key}.jsonl"
 
-    def get_or_create(self, key: str) -> Session:
+    def get_or_create(self, key: str, owner_id: str = "") -> Session:
         """
         取得既有 session 或建立新的。
 
         Args:
             key: Session key（通常為 channel:chat_id）。
+            owner_id: 使用者 ID，用於會話隔離。
 
         Returns:
             Session 物件。
         """
         if key in self._cache:
-            return self._cache[key]
+            session = self._cache[key]
+            if owner_id and session.owner_id and session.owner_id != owner_id:
+                logger.warning("Session {} access denied for owner {}", key, owner_id)
+                return Session(key=key, owner_id=owner_id)
+            if session.is_expired():
+                session.clear()
+            return session
 
-        session = self._load(key)
+        session = self._load(key, owner_id)
         if session is None:
-            session = Session(key=key)
+            session = Session(key=key, owner_id=owner_id)
 
         self._cache[key] = session
         return session
 
-    def _load(self, key: str) -> Session | None:
+    def _load(self, key: str, owner_id: str = "") -> Session | None:
         """從磁碟載入 session。"""
         path = self._get_session_path(key)
         if not path.exists():
@@ -120,6 +134,7 @@ class SessionManager:
             metadata = {}
             created_at = None
             last_consolidated = 0
+            loaded_owner_id = ""
 
             with open(path, encoding="utf-8") as f:
                 for line in f:
@@ -133,11 +148,13 @@ class SessionManager:
                         metadata = data.get("metadata", {})
                         created_at = datetime.fromisoformat(data["created_at"]) if data.get("created_at") else None
                         last_consolidated = data.get("last_consolidated", 0)
+                        loaded_owner_id = data.get("owner_id", "")
                     else:
                         messages.append(data)
 
             return Session(
                 key=key,
+                owner_id=owner_id or loaded_owner_id,
                 messages=messages,
                 created_at=created_at or datetime.now(),
                 metadata=metadata,
@@ -155,6 +172,7 @@ class SessionManager:
             metadata_line = {
                 "_type": "metadata",
                 "key": session.key,
+                "owner_id": session.owner_id,
                 "created_at": session.created_at.isoformat(),
                 "updated_at": session.updated_at.isoformat(),
                 "metadata": session.metadata,

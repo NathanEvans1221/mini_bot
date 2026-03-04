@@ -81,7 +81,7 @@ class LiteLLMProvider(LLMProvider):
             )
         except Exception as e:
             logger.error("LLM call failed: {}", e)
-            return LLMResponse(content=f"Error: {e}")
+            return LLMResponse(content="抱歉，處理您的請求時發生錯誤，請稍後再試。")
 
     def get_default_model(self) -> str:
         return self.model

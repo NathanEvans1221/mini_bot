@@ -1,4 +1,5 @@
 {
+  "_comment": "建議使用環境變數：export MINIMAX_API_KEY='your-key' && export TELEGRAM_BOT_TOKEN='your-token'",
   "agents": {
     "defaults": {
       "model": "minimax/MiniMax-M2.5",
@@ -11,14 +12,14 @@
   },
   "providers": {
     "minimax": {
-      "apiKey": "your-minimax-api-key-here",
+      "apiKey": "",
       "apiBase": "https://api.minimax.io/v1"
     }
   },
   "channels": {
     "telegram": {
       "enabled": true,
-      "botToken": "your-telegram-bot-token-here",
+      "botToken": "",
       "allow_from": [
         "your-telegram-user-id-here"
       ]

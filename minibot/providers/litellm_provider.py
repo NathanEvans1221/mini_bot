@@ -5,6 +5,7 @@ import json_repair
 from typing import Any
 from loguru import logger
 import litellm
+from minibot.i18n import t
 from minibot.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 
@@ -81,7 +82,7 @@ class LiteLLMProvider(LLMProvider):
             )
         except Exception as e:
             logger.error("LLM call failed: {}", e)
-            return LLMResponse(content="抱歉，處理您的請求時發生錯誤，請稍後再試。")
+            return LLMResponse(content=t("error.llm_request_failed"))
 
     def get_default_model(self) -> str:
         return self.model

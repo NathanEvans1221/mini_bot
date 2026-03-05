@@ -4,6 +4,7 @@ from typing import Any
 from loguru import logger
 
 from minibot.agent.tools.base import Tool
+from minibot.i18n import t
 
 
 class ToolRegistry:
@@ -33,4 +34,4 @@ class ToolRegistry:
             return await tool.execute(**params)
         except Exception as e:
             logger.error("Tool execution error: {}", e)
-            return "抱歉，執行工具時發生錯誤，請稍後再試。"
+            return t("error.tool_execution_failed")

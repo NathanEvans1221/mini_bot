@@ -16,6 +16,7 @@ from telegram.request import HTTPXRequest
 
 from minibot.agent.loop import AgentLoop
 from minibot.bus.queue import MessageBus
+from minibot.i18n import init as i18n_init, t
 from minibot.providers.base import LLMProvider
 
 
@@ -45,6 +46,7 @@ class TelegramChannel:
             max_tokens=max_tokens,
             memory_window=memory_window,
         )
+        i18n_init()
 
     async def _handle_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """處理 /start 指令。"""
@@ -77,7 +79,7 @@ class TelegramChannel:
 
         except Exception as e:
             logger.error("Telegram handler error: {}", e)
-            await update.message.reply_text("抱歉，處理您的請求時發生錯誤，請稍後再試。")
+            await update.message.reply_text(t("error.llm_request_failed"))
 
     def run(self) -> None:
         """啟動 Telegram Bot（Polling 模式）。"""

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 from cryptography.fernet import Fernet
 from minibot.config.schema import Config
+from minibot.i18n import t as _t
 
 _fernet: Fernet | None = None
 _encryption_key_env = "MINIBOT_CONFIG_KEY"
@@ -96,7 +97,7 @@ def load_config(config_path: Path | None = None) -> Config:
             data = _decrypt_sensitive_fields(data)
             return Config.model_validate(data)
         except Exception as e:
-            print(f"Warning: Config load failed: {e}")
+            print(_t("error.config_load_failed", error=e))
     return Config()
 
 

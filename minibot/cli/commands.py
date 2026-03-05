@@ -18,12 +18,14 @@ from prompt_toolkit import PromptSession
 from minibot import __version__
 from minibot.bus.queue import MessageBus
 from minibot.config.loader import load_config, save_config, get_config_path
+from minibot.i18n import init as i18n_init, t
 from minibot.providers.litellm_provider import LiteLLMProvider
 from minibot.session.manager import SessionManager
 from minibot.utils.helpers import ensure_dir, get_data_path
 
 app = typer.Typer(help="minibot - Personal AI Assistant (powered by mini_bot)")
 console = Console()
+i18n_init()
 
 
 @app.command()
@@ -35,9 +37,9 @@ def onboard():
         config_path.write_text(
             '{\n  "providers": {\n    "minimax": {\n      "apiKey": "",\n      "apiBase": "https://api.minimax.io/v1"\n    }\n  }\n}'
         )
-        console.print(f"✅ Config created: {config_path}")
+        console.print(t("cli.onboard.config_created", path=config_path))
     else:
-        console.print(f"Config already exists: {config_path}")
+        console.print(t("cli.onboard.config_exists", path=config_path))
 
     ws = Path("~/.minibot/workspace").expanduser()
     ensure_dir(ws)
@@ -45,8 +47,8 @@ def onboard():
     agents_file = ws / "AGENTS.md"
     if not agents_file.exists():
         agents_file.write_text("# Agent Instructions\n\nYou are a helpful AI assistant.\n")
-    console.print(f"✅ Workspace: {ws}")
-    console.print("\n📝 Edit ~/.minibot/config.json to add your API key, then run: minibot agent")
+    console.print(t("cli.onboard.workspace_ready", path=ws))
+    console.print(t("cli.onboard.edit_config"))
 
 
 def _make_provider(config):
@@ -75,7 +77,7 @@ def _make_provider(config):
                 litellm_prefix=prefix,
             )
 
-    console.print("[red]Error: No API key configured. Edit ~/.minibot/config.json[/red]")
+    console.print(f"[red]{t('cli.error.no_api_key')}[/red]")
     raise typer.Exit(1)
 
 
@@ -116,8 +118,8 @@ def agent(
         return
 
     # 互動模式
-    console.print(f"[bold cyan]🤖 minibot v{__version__}[/bold cyan]")
-    console.print("Type 'exit' to quit.\n")
+    console.print(t("cli.agent.welcome", version=__version__))
+    console.print(f"{t('cli.agent.exit_hint')}\n")
 
     session = PromptSession()
 
@@ -133,38 +135,36 @@ def agent(
             if not user_input.strip():
                 continue
 
-            console.print("[dim]Thinking...[/dim]")
+            console.print(f"[dim]{t('cli.agent.thinking')}[/dim]")
             result = await agent_loop.process_direct(user_input)
             console.print()
             _print_response(result)
             console.print()
 
     asyncio.run(run_interactive())
-    console.print("\n[dim]Goodbye! 🤖[/dim]")
+    console.print(f"\n[dim]{t('cli.agent.goodbye')}[/dim]")
 
 
 @app.command()
 def status():
     """顯示 minibot 目前狀態。"""
     config = load_config()
-    console.print(f"[bold]🤖 minibot v{__version__}[/bold]")
-    console.print(f"Config: {get_config_path()}")
-    console.print(f"Model: {config.agents.defaults.model}")
+    console.print(t("cli.status.title", version=__version__))
+    console.print(t("cli.status.config", path=get_config_path()))
+    console.print(t("cli.status.model", model=config.agents.defaults.model))
 
-    # 檢查 provider 設定
     for name in ("minimax", "openrouter", "anthropic", "openai", "deepseek", "gemini"):
         prov = getattr(config.providers, name)
         if prov.api_key:
             masked = prov.api_key[:8] + "..." + prov.api_key[-4:]
-            console.print(f"Provider: {name} ✅ ({masked})")
+            console.print(t("cli.status.provider_enabled", name=name, masked=masked))
 
-    # 檢查 Telegram 設定
     tg_token = config.channels.telegram.bot_token
     if tg_token:
         masked = tg_token[:8] + "..." + tg_token[-4:]
-        console.print(f"Telegram: ✅ ({masked})")
+        console.print(t("cli.status.telegram_enabled", masked=masked))
     else:
-        console.print("Telegram: ❌ (未設定)")
+        console.print(t("cli.status.telegram_disabled"))
 
 
 @app.command()
@@ -174,16 +174,16 @@ def telegram():
     bot_token = config.channels.telegram.bot_token
 
     if not bot_token:
-        console.print("[red]Error: Telegram bot token not configured.[/red]")
-        console.print("Edit ~/.minibot/config.json and add channels.telegram.botToken")
+        console.print(f"[red]{t('cli.telegram.error_no_token')}[/red]")
+        console.print(t("cli.telegram.error_token_hint"))
         raise typer.Exit(1)
 
     provider = _make_provider(config)
     workspace = Path(config.agents.defaults.workspace).expanduser()
     ensure_dir(workspace)
 
-    console.print(f"[bold cyan]🤖 minibot Telegram Bot v{__version__}[/bold cyan]")
-    console.print("Starting Polling mode... Press Ctrl+C to stop.\n")
+    console.print(t("cli.telegram.welcome", version=__version__))
+    console.print(f"{t('cli.telegram.starting')}\n")
 
     from minibot.channels.telegram import TelegramChannel
     channel = TelegramChannel(

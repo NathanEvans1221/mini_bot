@@ -250,3 +250,5 @@ Get-ChildItem -Recurse -File -Filter *.py minibot | Select-Object FullName | For
 ```
 
 > **📊 截至 2026-02-28：核心程式碼約為 978 行**
+
+<!-- [😸SAM] -->

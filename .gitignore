@@ -57,3 +57,4 @@ workspace/memory/HISTORY.md
 *.log
 logs/
 .grepai/
+.aider*

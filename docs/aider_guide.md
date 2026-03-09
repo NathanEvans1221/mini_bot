@@ -1,0 +1,95 @@
+# 🤖 Aider 安裝與操作指南 (Windows)
+
+[Aider](https://aider.chat/) 是一個強大的終端機 AI 結對程式碼開發助手 (Pair Programming in your Terminal)。它可以直接在你的專案目錄下運行，並擁有**直接編輯檔案**與**自動提交 Git Commit** 的超強能力，能極大提升 AI 輔助開發的成功率。
+
+本文檔將介紹如何在 Windows (PowerShell) 環境下安裝與使用 Aider，並搭配你的專案一起工作。
+
+---
+
+## 1. 📥 安裝 Aider
+
+在你的 terminal 內透過 pip 進行全域或專案層級的安裝：
+
+```powershell
+pip install aider-chat
+```
+
+安裝完成後，你可以透過以下指令確認版本：
+
+```powershell
+aider --version
+```
+
+---
+
+## 2. 🔑 設定 API Key (以 OpenAI 或 Anthropic 為例)
+
+Aider 需要一個強大的大語言模型 (例如 GPT-4o 或 Claude 3.5 Sonnet) 來確保它能正確修改程式碼架構。
+
+在使用前，必須設定環境變數提供你的 API Key。  
+在 **PowerShell 7** 中：
+
+```powershell
+# 如果使用 OpenAI 模型（預設）
+$env:OPENAI_API_KEY="sk-你的_OpenAI_API_Key"
+
+# 如果使用 Anthropic 模型（目前生成程式碼最強）
+$env:ANTHROPIC_API_KEY="sk-ant-你的_Anthropic_API_Key"
+```
+
+> **💡 提示：永久設定環境變數**  
+> 如果你不想每次開終端機都要重新設定，可以將上述指令加入你的 PowerShell Profile 中：
+> 執行 `code $profile`，然後將環境變數寫入該檔案。
+
+---
+
+## 3. 🚀 開始結對程式設計 (Pair Programming)
+
+進入你的專案目錄 (例如 `mini_bot`)，直接啟動 Aider：
+
+```powershell
+# 啟動 Aider 並指定你要修改的檔案
+aider minibot/agent/loop.py
+```
+
+或者不帶參數直接啟動：
+
+```powershell
+aider
+```
+
+啟動後，你進入了 Aider 的互動式終端機。它會掃描整個專案（Repo Map）來建立對程式碼架構的認知。
+
+---
+
+## 4. 💬 常用指令與操作邏輯
+
+在 Aider 介面中，直接打字就是對 AI 說話。但如果加上預設的斜線指令 (`/`)，可以執行各種強大的開發與系統控制。
+
+### 檔案管理
+- `/add <檔案>`：將檔案拉進這輪對話的 Context，讓 AI 參考或修改（例如 `/add README.md`）。
+- `/drop <檔案>`：把檔案從這輪 Context 中移除，節省 Token。
+- `/ls`：查看目前被加進 Context 的所有檔案列表。
+
+### 程式碼生成與 Git 保護
+當你說：「幫我把這裡的迴圈改成非同步」，Aider 會：
+1. **自動幫你 Commit 目前的修改**（如果有的話），確保一個乾淨的還原點。
+2. 呼叫大模型去重寫程式碼片段（Multi-file Edits）。
+3. 生成完畢後，**再幫你自動 Commit 一次**（附上 AI 產生的 `feat: ... ` 訊息）。
+
+如果它改壞了，或是你不滿意：
+- **`/undo`**：一秒還原上一次 AI 做的任何修改，完美反悔。
+- `/diff`：查看剛剛 AI 修改了哪些地方的差異。
+
+### 測試、自修復與系統指令
+- **`/run <指令>`**：直接在 Aider 裡執行指令（例如 `/run pytest`）。如果出錯，Aider 會自動讀取錯誤訊息並提出修正方案。
+- `/clear`：清空歷史對話，開始一個全新的思路。
+- `/exit` 或 `/quit`：離開 Aider 終端機。
+
+---
+
+## 5. 💡 Aider 為什麼對寫程式超級有幫助？
+
+1. **Repo Map 全域護城河**：它不會只看你加進去的單一檔案，它會透過抽象語法樹 (AST) 掃描專案，不會發生「改了 A 卻讓沒看到的 B 死掉」的悲劇。
+2. **搜尋取代模式 (Search/Replace)**：LLM 不需要重寫全檔，而是精準取代目標程式碼區塊，減少格式跑版，速度飛快。
+3. **無壓力的 Git 支援 (Undo)**：因為每次修改前都有 Commit 保護，你可以放心地盡情讓 AI 嘗試重構或加入新功能！

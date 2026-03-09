@@ -13,7 +13,7 @@
 
 ### 新增
 
-- **開發者工具文件**：新增 `docs/grepai_guide.md`，提供 grepai 語意搜尋工具的完整 Windows 安裝、初始化與操作指南。(Why: 幫助開發者快速上手 AI 輔助的代碼搜尋工具)
+- **開發者工具文件**：新增 `docs/grepai_guide.md` 與 `docs/aider_guide.md`，提供 grepai (語意搜尋工具) 與 Aider (AI 結對程式設計助手) 的完整 Windows 安裝與操作指南。(Why: 幫助開發者快速上手並極大化 AI 輔助寫碼成功率與效率)
 
 - **OS 特定規範**：建立 `Windows/GEMINI.md` 與 `macOS/GEMINI.md`，遵循 GEMINI.md 中的規則導航規範。(Why: 將作業系統特定的開發規則集中管理)
 - **Shell 工具**：`shell` 指令，讓 Agent 能執行系統指令。(Why: 擴展 Agent 能力範圍，使其能執行系統操作)
